@@ -174,28 +174,29 @@
             .preview-box .final-amount { font-size: 22px; }
         }
 
-        /* PRINT CSS */
+        /* PRINT CSS - TRỞ LẠI FORM A4/A5 TIÊU CHUẨN, RỘNG RÃI */
         #print-area { display: none; }
         @media print {
             .no-print { display: none !important; }
-            body { background: #fff; padding: 0; }
+            body { background: #fff; padding: 0; margin: 0; }
             #print-area { display: block; width: 100%; font-family: 'Segoe UI', Arial, sans-serif; color: #000;}
-            .receipt-page { page-break-after: always; padding: 10px; }
-            .print-header { text-align: center; margin-bottom: 15px; border-bottom: 2px solid #000; padding-bottom: 10px;}
-            .print-header h2 { font-size: 24px; margin: 0 0 5px 0; text-transform: uppercase; font-weight: 800;}
-            .customer-info { margin-bottom: 15px; line-height: 1.6;}
+            .receipt-page { page-break-after: always; padding: 20px; max-width: 800px; margin: auto; }
+            .print-header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 15px;}
+            .print-header h2 { font-size: 24px; margin: 0 0 8px 0; text-transform: uppercase; font-weight: 800;}
+            .shop-info { font-size: 15px; color: #333;}
+            .customer-info { margin-bottom: 20px; line-height: 1.6;}
             .customer-info p { margin: 0; font-size: 15px; }
-            .table-custom { width: 100%; border-top: 2px solid #000; border-bottom: 2px solid #000; margin-top: 10px; }
-            .table-header { display: flex; font-weight: bold; border-bottom: 1px dashed #000; padding: 8px 0; }
+            .table-custom { width: 100%; border-top: 2px solid #000; border-bottom: 2px solid #000; margin-top: 15px; }
+            .table-header { display: flex; font-weight: bold; border-bottom: 1px dashed #000; padding: 10px 0; }
             .col-price { width: 25%; text-align: right;} .col-qty { width: 15%; text-align: center; } .col-total { width: 30%; text-align: right; } .col-name { width: 30%;}
-            .product-item { border-bottom: 1px dashed #ccc; padding: 8px 0; display: flex;}
+            .product-item { border-bottom: 1px dashed #ccc; padding: 10px 0; display: flex;}
             .product-item:last-child { border-bottom: none; }
             .product-name { font-size: 15px; font-weight: bold; text-transform: uppercase; width: 30%; padding-right: 5px;}
-            .product-details { display: flex; width: 70%;}
-            .summary-section { text-align: right; margin-top: 15px; padding-top: 5px; }
-            .summary-section p { margin: 5px 0; font-size: 15px; }
-            .summary-section span { display: inline-block; width: 130px; font-weight: bold; }
-            .footer { text-align: center; margin-top: 30px; font-style: italic; font-size: 14px; border-top: 1px solid #ccc; padding-top: 10px;}
+            .product-details { display: flex; width: 70%; font-size: 15px;}
+            .summary-section { text-align: right; margin-top: 20px; padding-top: 10px; }
+            .summary-section p { margin: 6px 0; font-size: 15px; }
+            .summary-section span { display: inline-block; width: 140px; font-weight: bold; }
+            .footer { text-align: center; margin-top: 40px; font-style: italic; font-size: 15px; border-top: 1px solid #ccc; padding-top: 15px;}
         }
     </style>
 </head>
@@ -620,6 +621,8 @@
             if(ids.length === 0) { alert("Vui lòng tích chọn ít nhất 1 đơn để in!"); return; }
             let list = orderList.filter(o => ids.includes(o.id.toString())).reverse();
             let area = document.getElementById('print-area'); area.innerHTML = "";
+            
+            // TRỞ LẠI FORM IN A4/A5 QUEN THUỘC
             list.forEach(o => {
                 area.innerHTML += `
                 <div class="receipt-page">
@@ -650,7 +653,6 @@
             window.print();
         }
         
-        /* Thêm Keyframe cho icon quay lúc load */
         const style = document.createElement('style');
         style.innerHTML = `@keyframes spin { 100% { transform: rotate(360deg); } }`;
         document.head.appendChild(style);
