@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lên Đơn Hồng Nhiên - Mobile Friendly</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 10px; background-color: #eef2f7; }
+        .container { max-width: 950px; margin: auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 20px;}
+        h2 { color: #333; margin-top: 0; text-align: center; margin-bottom: 20px; font-size: 22px; }
+        fieldset { border: 1px solid #ced4da; border-radius: 8px; padding: 15px; margin-bottom: 20px; background-color: #fff; }
+        legend { font-weight: bold; color: #007bff; background: #eef2f7; padding: 4px 12px; border-radius: 4px; border: 1px solid #ced4da; font-size: 15px; }
+        .form-group { margin-bottom: 12px; display: flex; flex-direction: column; }
+        label { font-weight: 600; margin-bottom: 6px; color: #444; font-size: 14px; }
+        input, select { padding: 12px 10px; border: 1px solid #ced4da; border-radius: 6px; font-size: 15px; outline: none; }
+        input:focus, select:focus { border-color: #007bff; background-color: #f8fbff;}
+        .row { display: flex; flex-wrap: wrap; gap: 15px; }
+        .col { flex: 1; min-width: 200px; }
+        .btn { padding: 10px 15px; border: none; border-radius: 6px; font-size: 15px; cursor: pointer; font-weight: bold; transition: 0.2s; text-align: center; }
+        .btn-add-sp { background-color: #17a2b8; color: white; margin-top: 26px; height: 46px; width: 100%;}
+        .btn-save-order { background-color: #007bff; color: white; width: 100%; padding: 16px; font-size: 18px; margin-top: 10px; border-radius: 8px;}
+        .btn-save-order:disabled { background-color: #a0c4e1; cursor: not-allowed; }
+        .btn-print-all { background-color: #28a745; color: white; width: 100%; font-size: 18px; padding: 16px; border-radius: 8px;}
+        .btn-delete { background-color: #ff4d4d; color: white; padding: 6px 10px;}
+        .btn-delete:disabled, .btn-edit:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-edit { background-color: #ffc107; color: #333; margin-right: 5px; padding: 6px 10px;}
+        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #fff; font-size: 14px; min-width: 600px; }
+        th, td { border: 1px solid #dee2e6; padding: 12px 10px; text-align: left; vertical-align: middle; }
+        th { background-color: #f8f9fa; white-space: nowrap; }
+        .empty-row { text-align: center; color: #888; font-style: italic; }
+        .preview-box { background: #e9ecef; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 5px solid #007bff; }
+        .autocomplete-container { position: relative; }
+        .suggestions-list { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid #ccc; max-height: 250px; overflow-y: auto; z-index: 1000; display: none; margin: 0; padding: 0; list-style: none; border-radius: 0 0 6px 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);}
+        .suggestions-list li { padding: 12px 10px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; justify-content: space-between; align-items: center;}
+        .suggestions-list li:hover { background-color: #e9ecef; }
+        .status-bar { text-align: center; padding: 10px; margin-bottom: 20px; border-radius: 6px; font-size: 14px; font-weight: bold; }
+        .status-loading { background-color: #fff3cd; color: #856404; }
+        .status-success { background-color: #d4edda; color: #155724; }
+        .status-error { background-color: #f8d7da; color: #721c24; }
+        .print-check { width: 20px; height: 20px; cursor: pointer; accent-color: #28a745;}
+        
+        @media (max-width: 768px) {
+            body { padding: 5px; }
+            .container { padding: 15px; border-radius: 8px; margin-bottom: 15px;}
+            fieldset { padding: 12px; }
+            .col { min-width: 100%; }
+            .sp-group { min-width: 100%; }
+            .price-group { min-width: calc(60% - 15px); }
+            .qty-group { min-width: 40%; }
+            .btn-group { min-width: 100%; }
+            .btn-add-sp { margin-top: 5px; }
+        }
+
+        #print-area { display: none; }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { padding: 0; background: #fff;}
+            #print-area { display: block; width: 100%; font-family: Arial, sans-serif; }
+            .receipt-page { page-break-after: always; padding: 10px; }
+            .print-header { text-align: center; margin-bottom: 15px; border-bottom: 2px solid #000; padding-bottom: 10px;}
+            .print-header h2 { font-size: 22px; margin: 0 0 5px 0; }
+            .customer-info p { margin: 5px 0; font-size: 15px; }
+            .table-custom { width: 100%; border-top: 2px solid #000; margin-top: 10px; }
+            .table-header { display: flex; font-weight: bold; border-bottom: 1px solid #000; padding: 8px 0; }
+            .col-price { width: 25%; text-align: right;} .col-qty { width: 15%; text-align: center; } .col-total { width: 30%; text-align: right; } .col-name { width: 30%;}
+            .product-item { border-bottom: 1px dashed #ccc; padding: 6px 0; display: flex;}
+            .product-name { font-size: 15px; font-weight: bold; text-transform: uppercase; width: 30%; padding-right: 5px;}
+            .product-details { display: flex; width: 70%;}
+            .summary-section { text-align: right; margin-top: 15px; border-top: 2px dashed #000; padding-top: 10px; }
+            .summary-section p { margin: 4px 0; font-size: 15px; }
+            .summary-section span { display: inline-block; width: 120px; font-weight: bold; }
+            .footer { text-align: center; margin-top: 25px; font-weight: bold; font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container no-print">
+        <h2>Lên Đơn - M.X.D Hồng Nhiên</h2>
+        <div id="db-status" class="status-bar status-loading">⏳ Đang tải dữ liệu giá...</div>
+
+        <fieldset>
+            <legend>1. Khách Hàng & Nhân Viên</legend>
+            <div class="row">
+                <div class="col form-group">
+                    <label>Tên khách hàng</label>
+                    <input type="text" id="cusName" placeholder="Tên khách...">
+                </div>
+                <div class="col form-group">
+                    <label>Số điện thoại</label>
+                    <input type="tel" id="cusPhone" placeholder="SĐT khách...">
+                </div>
+                <div class="col form-group">
+                    <label>Nhân viên chốt đơn</label>
+                    <select id="staffName">
+                        <option value="Thịnh">Thịnh</option>
+                        <option value="Tâm">Tâm</option>
+                        <option value="Hòa">Hòa</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col form-group" style="flex: 2;">
+                    <label>Địa chỉ giao</label>
+                    <input type="text" id="cusAddress" placeholder="Địa chỉ / Tên chành xe...">
+                </div>
+                <div class="col form-group">
+                    <label>Kênh giao</label>
+                    <select id="saleChannel">
+                        <option value="Trực tiếp">Bán trực tiếp</option>
+                        <option value="GRAB">GRAB / Giao hỏa tốc</option>
+                        <option value="Gửi XE">Gửi Chành Xe</option>
+                        <option value="VTP">Viettel Post (VTP)</option>
+                    </select>
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>2. Máy móc & Phụ tùng</legend>
+            <div class="row" style="align-items: flex-start;">
+                <div class="col form-group autocomplete-container sp-group" style="flex: 2;">
+                    <label>Tên Sản Phẩm (Gõ để tìm)</label>
+                    <input type="text" id="prodName" placeholder="Gõ tên máy hoặc phụ tùng..." autocomplete="off">
+                    <ul id="suggestions" class="suggestions-list"></ul>
+                </div>
+                <div class="col form-group price-group">
+                    <label>Đơn giá</label>
+                    <input type="tel" id="price" placeholder="Giá..." oninput="formatInputMoney(this)" onblur="autoMultiplyStr(this)">
+                </div>
+                <div class="col form-group qty-group" style="max-width: 90px;">
+                    <label>SL</label>
+                    <input type="number" id="qty" value="1" min="1">
+                </div>
+                <div class="col form-group btn-group" style="max-width: 120px;">
+                    <button class="btn btn-add-sp" onclick="addProduct()">+ THÊM</button>
+                </div>
+            </div>
+            
+            <div class="table-responsive">
+                <table>
+                    <thead><tr><th>Tên SP</th><th>Đơn giá</th><th style="text-align:center;">SL</th><th style="text-align:right;">Thành tiền</th><th style="text-align:center;">Xóa</th></tr></thead>
+                    <tbody id="current-products-tbody"><tr><td colspan="5" class="empty-row">Chưa có sản phẩm.</td></tr></tbody>
+                </table>
+            </div>
+            <p style="text-align: right; margin-top: 15px; font-weight: bold; font-size: 16px;">Cộng tiền hàng: <span id="lbl-sum-items" style="color:#d9534f; font-size:20px;">0</span> đ</p>
+        </fieldset>
+
+        <fieldset>
+            <legend>3. Thanh Toán</legend>
+            <div class="row">
+                <div class="col form-group"><label>Phí ship (nếu có)</label><input type="tel" id="shipFee" placeholder="0" oninput="formatInputMoney(this)" onblur="autoMultiplyStr(this)"></div>
+                <div class="col form-group"><label>Khách Cọc / Tạm ứng</label><input type="tel" id="deposit" placeholder="0" oninput="formatInputMoney(this)" onblur="autoMultiplyStr(this)"></div>
+                <div class="col form-group" style="flex: 2;"><label>Ghi chú đơn</label><input type="text" id="note" placeholder="Ví dụ: Thu hộ COD 500k..."></div>
+            </div>
+            <div class="preview-box">
+                <h3 style="margin:0; display:flex; justify-content:space-between; align-items:center;">
+                    <span>TỔNG CẦN THU:</span>
+                    <span style="color: #d9534f; font-size: 24px;" id="lbl-final-total">0 đ</span>
+                </h3>
+            </div>
+            <button id="btnSave" class="btn btn-save-order" onclick="saveOrder()">LƯU ĐƠN & BẮN LÊN SHEET</button>
+        </fieldset>
+    </div>
+
+    <div class="container no-print">
+        <h3 style="margin: 5px 0 15px 0;">Danh sách chờ in (<span id="count">0</span>)</h3>
+        <div class="table-responsive">
+            <table id="order-table">
+                <thead><tr>
+                    <th style="text-align:center; width: 40px;"><input type="checkbox" id="selectAll" class="print-check" checked onclick="toggleSelectAll(this)"></th>
+                    <th>Khách hàng</th>
+                    <th>Nhân viên</th>
+                    <th>Cần thu</th>
+                    <th style="min-width: 130px; text-align:center;">Thao tác</th>
+                </tr></thead>
+                <tbody id="order-tbody"></tbody>
+            </table>
+        </div>
+        <button class="btn btn-print-all" style="margin-top:20px;" onclick="printSelectedOrders()">🖨️ IN CÁC ĐƠN ĐÃ TÍCH CHỌN</button>
+    </div>
+
+    <div id="print-area"></div>
+
+    <script>
+        const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbz7f0qZ49J8qD7sSwfP3GkZzcueLjhtBxf2stcjx5otQ1ys7H8Sl1cPSJa2plVpQb93/exec";
+        const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRsF6sTL40fsBCmpLiQhIk3vSkh_NfecA0DfO0NOthHvMI3CoKLiAjgs6q0Sowi3inJDl6Teq12WuqJ/pub?gid=0&single=true&output=tsv";
+        
+        let productDatabase = []; let currentProducts = []; let orderList = [];
+
+        function saveOrdersToLocal() { localStorage.setItem('hongnhien_orders', JSON.stringify(orderList)); }
+        function loadOrdersFromLocal() {
+            let saved = localStorage.getItem('hongnhien_orders');
+            if (saved) { orderList = JSON.parse(saved); renderOrderList(); }
+        }
+
+        window.onload = async function() {
+            loadOrdersFromLocal();
+            let statusEl = document.getElementById('db-status');
+            try {
+                let data = "";
+                try {
+                    let res1 = await fetch(SHEET_URL); if(!res1.ok) throw new Error(); data = await res1.text();
+                } catch (e1) {
+                    try {
+                        let res2 = await fetch("https://api.allorigins.win/get?url=" + encodeURIComponent(SHEET_URL)); if(!res2.ok) throw new Error(); let json = await res2.json(); data = json.contents;
+                    } catch (e2) {
+                        let res3 = await fetch("https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(SHEET_URL)); if(!res3.ok) throw new Error(); data = await res3.text();
+                    }
+                }
+                let rows = data.split(/\r?\n/); let tempDB = [];
+                for(let i = 1; i < rows.length; i++) {
+                    let cols = rows[i].split('\t');
+                    if(cols.length >= 2) {
+                        let name = cols[0].replace(/"/g, '').trim();
+                        let rawPrice = cols[1].replace(/"/g, '').trim();
+                        let lastSep = Math.max(rawPrice.lastIndexOf(','), rawPrice.lastIndexOf('.'));
+                        if (lastSep !== -1 && rawPrice.substring(lastSep+1).replace(/[^0-9]/g, '').length <= 2) { rawPrice = rawPrice.substring(0, lastSep); }
+                        let price = parseInt(rawPrice.replace(/[^0-9]/g, '')) || 0;
+                        if(name) tempDB.push({ name, price });
+                    }
+                }
+                if (tempDB.length === 0) throw new Error("File rỗng");
+                productDatabase = tempDB;
+                statusEl.className = 'status-bar status-success'; statusEl.innerText = `✅ Đã tải ${productDatabase.length} sản phẩm.`;
+                setTimeout(() => { statusEl.style.display = 'none'; }, 3000);
+            } catch (e) { statusEl.className = 'status-bar status-error'; statusEl.innerText = '❌ Lỗi tải giá. Vui lòng tải lại trang!'; }
+        };
+
+        function formatMoney(n) { return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+        function forceMultiplier(v) { return (v > 0 && v < 100000) ? v * 1000 : v; }
+
+        const inputSp = document.getElementById('prodName'); const listSuggestions = document.getElementById('suggestions');
+        inputSp.addEventListener('input', function() {
+            let kw = this.value.toLowerCase().trim(); listSuggestions.innerHTML = '';
+            if(!kw) { listSuggestions.style.display = 'none'; return; }
+            let matched = productDatabase.filter(p => p.name.toLowerCase().includes(kw)).slice(0, 15);
+            if(matched.length > 0) {
+                listSuggestions.style.display = 'block';
+                matched.forEach(p => {
+                    let li = document.createElement('li'); let pr = forceMultiplier(p.price);
+                    li.innerHTML = `<span class="sp-name">${p.name}</span> <span class="sp-price">${formatMoney(pr)} đ</span>`;
+                    li.onclick = () => { inputSp.value = p.name; document.getElementById('price').value = formatMoney(pr); listSuggestions.style.display = 'none'; document.getElementById('qty').focus(); calculateFinalTotal(); };
+                    listSuggestions.appendChild(li);
+                });
+            } else listSuggestions.style.display = 'none';
+        });
+
+        document.addEventListener('click', e => { if(!inputSp.contains(e.target) && !listSuggestions.contains(e.target)) listSuggestions.style.display = 'none'; });
+
+        function formatInputMoney(i) { let v = i.value.replace(/[^0-9]/g, ''); i.value = v ? formatMoney(parseInt(v)) : ""; calculateFinalTotal(); }
+        function autoMultiplyStr(i) { let v = forceMultiplier(parseInt(i.value.replace(/[^0-9]/g, '')) || 0); i.value = v ? formatMoney(v) : ""; calculateFinalTotal(); }
+        function getSafeValue(id) { return forceMultiplier(parseInt(document.getElementById(id).value.replace(/[^0-9]/g, '')) || 0); }
+
+        function addProduct() {
+            let n = document.getElementById('prodName').value; let p = getSafeValue('price'); let q = parseInt(document.getElementById('qty').value) || 1;
+            if(!n) return;
+            currentProducts.push({ name: n, price: p, qty: q, total: p * q });
+            document.getElementById('prodName').value = ""; document.getElementById('price').value = ""; document.getElementById('qty').value = "1";
+            renderCurrentProducts(); document.getElementById('prodName').focus();
+        }
+
+        function removeProduct(i) { currentProducts.splice(i, 1); renderCurrentProducts(); }
+        function renderCurrentProducts() {
+            let tb = document.getElementById('current-products-tbody'); tb.innerHTML = ""; let sum = 0;
+            if(!currentProducts.length) tb.innerHTML = '<tr><td colspan="5" class="empty-row">Chưa có sản phẩm.</td></tr>';
+            currentProducts.forEach((p, i) => { sum += p.total; tb.innerHTML += `<tr><td><strong>${p.name}</strong></td><td>${formatMoney(p.price)}</td><td align="center"><strong>${p.qty}</strong></td><td align="right">${formatMoney(p.total)}</td><td align="center"><button class="btn btn-delete" onclick="removeProduct(${i})">X</button></td></tr>`; });
+            document.getElementById('lbl-sum-items').innerText = formatMoney(sum); calculateFinalTotal();
+        }
+
+        function calculateFinalTotal() {
+            let sum = currentProducts.reduce((s, p) => s + p.total, 0);
+            let total = sum + getSafeValue('shipFee') - getSafeValue('deposit');
+            document.getElementById('lbl-final-total').innerText = formatMoney(total) + " đ";
+            return { sum, total };
+        }
+
+        function saveOrder() {
+            let name = document.getElementById('cusName').value;
+            if(!name || !currentProducts.length) { alert("Thiếu tên khách hàng hoặc chưa có sản phẩm nào!"); return; }
+            let res = calculateFinalTotal(); let orderId = Date.now().toString(); 
+            
+            let data = {
+                action: 'save', orderId: orderId,
+                date: new Date().toLocaleDateString('vi-VN'),
+                time: new Date().toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'}),
+                cusName: name, cusPhone: document.getElementById('cusPhone').value, cusAddress: document.getElementById('cusAddress').value,
+                staffName: document.getElementById('staffName').value, saleChannel: document.getElementById('saleChannel').value,
+                spString: currentProducts.map(p => `${p.name} (${formatMoney(p.price)}x${p.qty})`).join("\n"),
+                sumItems: res.sum, shipFee: getSafeValue('shipFee'), deposit: getSafeValue('deposit'), finalTotal: res.total, note: document.getElementById('note').value
+            };
+
+            let btn = document.getElementById('btnSave'); btn.innerText = "⏳ Đang đẩy dữ liệu..."; btn.disabled = true;
+
+            fetch(WEBAPP_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(data).toString() })
+            .then(r => r.text()).then(resText => {
+                if(resText === "SUCCESS") {
+                    orderList.push({...data, id: orderId, products: [...currentProducts]});
+                    resetForm(); renderOrderList(); localStorage.setItem('hongnhien_orders', JSON.stringify(orderList));
+                } else alert("Lỗi từ Google: " + resText);
+            })
+            .catch(() => alert("Không thể kết nối mạng. Hãy kiểm tra lại Wifi/4G!"))
+            .finally(() => { btn.innerText = "LƯU ĐƠN & BẮN LÊN SHEET"; btn.disabled = false; });
+        }
+
+        function deleteOrder(id, btnElement) { 
+            if(confirm("HỦY ĐƠN: Đơn này sẽ bị xóa trên cả phần mềm và Google Sheet. Xác nhận?")) {
+                let originalText = btnElement.innerText; btnElement.innerText = "⏳..."; btnElement.disabled = true;
+                fetch(WEBAPP_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ action: 'delete', orderId: id }).toString() })
+                .then(r => r.text()).then(resText => {
+                    if(resText === "DELETED" || resText === "NOT_FOUND") {
+                        orderList = orderList.filter(o => o.id !== id.toString()); renderOrderList(); localStorage.setItem('hongnhien_orders', JSON.stringify(orderList));
+                    } else { alert("Lỗi Sheet: " + resText); btnElement.innerText = originalText; btnElement.disabled = false; }
+                }).catch(() => { alert("Lỗi mạng!"); btnElement.innerText = originalText; btnElement.disabled = false; });
+            }
+        }
+
+        function editOrder(id, btnElement) {
+            if (currentProducts.length > 0 && !confirm("Đang nhập dở đơn khác, tiếp tục sẽ bị mất. Xác nhận?")) return;
+            let orderToEdit = orderList.find(o => o.id === id.toString()); if(!orderToEdit) return;
+
+            if(confirm("Đơn này sẽ được gỡ khỏi Google Sheet để sửa. Sau khi sửa xong, NHỚ BẤM LƯU LẠI NHÉ!")) {
+                let originalText = btnElement.innerText; btnElement.innerText = "⏳..."; btnElement.disabled = true;
+                fetch(WEBAPP_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ action: 'delete', orderId: id }).toString() })
+                .then(r => r.text()).then(resText => {
+                    if(resText === "DELETED" || resText === "NOT_FOUND") {
+                        document.getElementById('cusName').value = orderToEdit.cusName; document.getElementById('cusPhone').value = orderToEdit.cusPhone;
+                        document.getElementById('cusAddress').value = orderToEdit.cusAddress; document.getElementById('saleChannel').value = orderToEdit.saleChannel;
+                        document.getElementById('staffName').value = orderToEdit.staffName; document.getElementById('shipFee').value = orderToEdit.shipFee > 0 ? formatMoney(orderToEdit.shipFee) : "";
+                        document.getElementById('deposit').value = orderToEdit.deposit > 0 ? formatMoney(orderToEdit.deposit) : ""; document.getElementById('note').value = orderToEdit.note;
+                        currentProducts = [...orderToEdit.products];
+                        orderList = orderList.filter(o => o.id !== id.toString()); renderCurrentProducts(); renderOrderList(); localStorage.setItem('hongnhien_orders', JSON.stringify(orderList));
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    } else { alert("Lỗi Sheet: " + resText); btnElement.innerText = originalText; btnElement.disabled = false; }
+                }).catch(() => { alert("Lỗi mạng!"); btnElement.innerText = originalText; btnElement.disabled = false; });
+            }
+        }
+
+        function resetForm() { currentProducts = []; ["cusName", "cusPhone", "cusAddress", "shipFee", "deposit", "note"].forEach(id => document.getElementById(id).value = ""); renderCurrentProducts(); document.getElementById('cusName').focus(); }
+
+        function renderOrderList() {
+            let tb = document.getElementById('order-tbody'); tb.innerHTML = "";
+            [...orderList].reverse().forEach(o => {
+                tb.innerHTML += `<tr><td align="center"><input type="checkbox" class="print-check" value="${o.id}" checked></td><td><strong>${o.cusName}</strong></td><td>NV: ${o.staffName}</td><td style="color:#d9534f; font-weight:bold;">${formatMoney(o.finalTotal)}</td><td align="center"><button class="btn btn-edit" onclick="editOrder('${o.id}', this)">Sửa</button><button class="btn btn-delete" onclick="deleteOrder('${o.id}', this)">Xóa</button></td></tr>`;
+            });
+            document.getElementById('count').innerText = orderList.length;
+        }
+
+        function toggleSelectAll(s) { document.querySelectorAll('.print-check').forEach(cb => cb.checked = s.checked); }
+
+        function printSelectedOrders() {
+            let ids = Array.from(document.querySelectorAll('.print-check:checked')).map(cb => cb.value);
+            let list = orderList.filter(o => ids.includes(o.id.toString())).reverse();
+            let area = document.getElementById('print-area'); area.innerHTML = "";
+            list.forEach(o => {
+                area.innerHTML += `
+                <div class="receipt-page">
+                    <div class="print-header"><h2>PHIẾU GIAO HÀNG</h2><p>Ngày: ${o.date} | Mã: ${o.id.toString().slice(-6)}</p></div>
+                    <div class="customer-info">
+                        <p>Khách hàng: <strong>${o.cusName.toUpperCase()}</strong></p>
+                        <p>SĐT: ${o.cusPhone} | Kênh: ${o.saleChannel}</p>
+                        <p>Địa chỉ: ${o.cusAddress}</p>
+                        <p>Nhân viên lên đơn: <strong>${o.staffName}</strong></p>
+                    </div>
+                    <div class="table-custom">
+                        <div class="table-header"><div class="col-name">Tên sản phẩm</div><div class="col-price">Đơn giá</div><div class="col-qty">SL</div><div class="col-total">Thành tiền</div></div>
+                        ${o.products.map(p => `<div class="product-item"><div class="product-name">${p.name}</div><div class="product-details"><div class="col-price">${formatMoney(p.price)}</div><div class="col-qty">${p.qty}</div><div class="col-total">${formatMoney(p.total)}</div></div></div>`).join('')}
+                    </div>
+                    <div class="summary-section">
+                        <p>Tổng tiền: <span>${formatMoney(o.sumItems)}</span></p>
+                        <p>Tạm ứng: <span>${formatMoney(o.deposit)}</span></p>
+                        <p>Phí ship: <span>${formatMoney(o.shipFee)}</span></p>
+                        <p style="font-size:18px;"><strong>TỔNG THU: <span>${formatMoney(o.finalTotal)}</span></strong></p>
+                    </div>
+                    <p style="margin-top:10px; font-style: italic;">Ghi chú: ${o.note}</p>
+                    <div class="footer">XIN CẢM ƠN QUÝ KHÁCH ĐÃ ỦNG HỘ SHOP!</div>
+                </div>`;
+            });
+            window.print();
+        }
+    </script>
+</body>
+</html>
